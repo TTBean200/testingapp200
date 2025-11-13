@@ -9,7 +9,7 @@ import { data } from './data/resource';
 const backend = defineBackend({
     imagesStorage,
     generateThumb,
-    //auth,
+    auth,
     //data
 });
 
