@@ -10,7 +10,7 @@ const backend = defineBackend({
     imagesStorage,
     generateThumb,
     auth,
-    //data
+    data
 });
 
 backend.imagesStorage.resources.bucket.addEventNotification(
