@@ -66,7 +66,7 @@ export async function resizeImage(imageBuffer: Buffer, key: string): Promise<Buf
 }
 
 function getMimeType(key: string) {
-    const extension = key.split('.').pop();
+    const extension = key.toLowerCase().split('.').pop();
     switch (extension) {
         case 'jpg':
         case 'jpeg':
