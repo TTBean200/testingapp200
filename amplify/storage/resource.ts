@@ -6,12 +6,12 @@ export const imagesStorage = defineStorage({
     access: (allow) => ({
         'originals/*': [
             allow.resource(generateThumb).to(['read']),
-            allow.authenticated.to(['write', 'read']),
+            allow.authenticated.to(['write', 'read','delete']),
             allow.guest.to(['read'])
           ],
           'thumbs/*': [
             allow.resource(generateThumb).to(['write']),
-            allow.authenticated.to(['read']),
+            allow.authenticated.to(['read','delete']),
             allow.guest.to(['read'])
           ]
     })
