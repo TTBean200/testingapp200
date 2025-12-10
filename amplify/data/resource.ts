@@ -8,12 +8,14 @@ const schema = a.schema({
   Place: a
     .model({
       id: a.id().required(),
-      useremail: a.string().required(),
+      userEmail: a.string().required(),
       name: a.string().required(),
       description: a.string().required(),
       photos: a.string().array(),
       thumbs: a.string().array(),
-      comments: a.ref('Comment').array()
+      comments: a.ref('Comment').array(),
+      creationDate: a.datetime().required(),
+      lastUpdate:a.datetime().required()
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
