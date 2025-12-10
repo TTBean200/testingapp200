@@ -8,6 +8,7 @@ const schema = a.schema({
   Place: a
     .model({
       id: a.id().required(),
+      useremail: a.string().required(),
       name: a.string().required(),
       description: a.string().required(),
       photos: a.string().array(),
