@@ -6,6 +6,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { uploadData } from "aws-amplify/storage";
 
+
 export type CustomEvent = {
     target: HTMLInputElement
 }
@@ -32,7 +33,7 @@ function CreatePlace() {
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
 
-        if(placeName && placeDescription) {
+        if(placeName && placeDescription && userName) {
             let placePhotosUrls: string[] = [];
             let placePhotosThumbsUrls: string[] = [];
             if (placePhotos) {
@@ -41,11 +42,17 @@ function CreatePlace() {
                 placePhotosThumbsUrls = uploadResult.thumbs;
             }
 
+            const now =new Date();
+            
             const place = await client.create({
                 name: placeName,
                 description: placeDescription,
                 photos: placePhotosUrls,
-                thumbs: placePhotosThumbsUrls
+                thumbs: placePhotosThumbsUrls,
+                userEmail: userName,
+                createdAt: now.toISOString(),
+                updatedAt: now.toISOString()
+
             })
             console.log(place)
             alert(`Place with id ${place.data?.id} created`)
