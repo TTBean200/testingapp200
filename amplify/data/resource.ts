@@ -14,8 +14,8 @@ const schema = a.schema({
       photos: a.string().array(),
       thumbs: a.string().array(),
       comments: a.ref('Comment').array(),
-      createdAt: a.datetime().required(),
-      updatedAt: a.datetime().required()
+      createdAt: a.datetime(),
+      updatedAt: a.datetime()
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
