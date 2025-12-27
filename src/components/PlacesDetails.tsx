@@ -3,7 +3,8 @@ import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useEffect, useState } from "react"
 import { type Place } from "./Places";
-import { StorageImage } from "@aws-amplify/ui-react-storage";
+import { StorageImage} from "@aws-amplify/ui-react-storage";
+import { getUrl } from "aws-amplify/storage";
 import { checkLoginAndGetName } from "../utils/AuthUtils";
 import { type CustomEvent } from "./CreatePlace";
 import Comment from "./Comments";
@@ -47,16 +48,57 @@ function PlaceDetails() {
 
     }, [])
 
+    async function getFileUrl(p:string) {
+        return await getUrl({path: p})
+
+    }
+
     function renderPhotos() {
-        const rows: any[] = []
+        const rows: any[] = [];
+        let signedURL:URL;
+
         if (place) {
             place.photos?.forEach((photo, index) => {
                 if (photo) {
+                    console.log('photoes', photo)
                     /**
                      * Files can be also handled with the aws-amplify/storage package:
                      * https://docs.amplify.aws/angular/build-a-backend/storage/download-files/
                      */
-                    rows.push(<StorageImage path={photo} alt={photo} key={index} height={300} />)
+                    if (photo.includes('files')) {
+                        rows.push(<iframe id={photo} key={photo} src="#"></iframe>)
+                        console.log("contain files")
+
+                        getFileUrl(photo).then( (data)=>{
+                        
+                            console.log("data url is", data.url.href)
+
+                            const iframeElement = document.getElementById(`${photo}`) as HTMLIFrameElement;
+
+                                    if (iframeElement) {
+                                        // Access the 'src' property
+                                        iframeElement.src = data.url.href
+                                        //const iframeUrl: string = iframeElement.src;
+                                        //console.log("Iframe URL:", iframeUrl);
+                                    } else {
+                                        console.error("Iframe element not found!");
+                                    }
+                            // rows.push( <iframe
+                            //     title="PDF"
+                            //     src={data.url.href}
+                            //     style={{ width: "100%", height: 800, border: "1px solid #ddd" }}
+                            //     />)
+
+                            //rows.push(<a href={data.url.href} target="_blank" rel="noopener noreferrer">
+                            //View PDF
+                            //</a>)
+                        })
+                        
+
+                    }else {
+                        console.log("not contain files")
+                        rows.push(<StorageImage path={photo} alt={photo} key={index} height={300} />)
+                    }
                 }
             })
         }

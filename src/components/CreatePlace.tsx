@@ -33,29 +33,42 @@ function CreatePlace() {
     async function handleSubmit(event: React.SyntheticEvent) {
         event.preventDefault();
 
+        const now =new Date();
+        let placePhotosUrls: string[] = [];
+        let placePhotosThumbsUrls: string[] = [];
+            
+        const place = await client.create({
+            name: placeName,
+            description: placeDescription,
+            photos: placePhotosUrls,
+            thumbs: placePhotosThumbsUrls,
+            userEmail: userName? userName:'',
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString()
+
+        })
+        
+        
+
         if(placeName && placeDescription && userName) {
-            let placePhotosUrls: string[] = [];
-            let placePhotosThumbsUrls: string[] = [];
-            if (placePhotos) {
-                const uploadResult = await uploadPhotos(placePhotos)
+            
+            if (placePhotos && place.data) {
+                const uploadResult = await uploadPhotos(placePhotos, place.data.id)
                 placePhotosUrls = uploadResult.urls;
                 placePhotosThumbsUrls = uploadResult.thumbs;
             }
 
-            const now =new Date();
-            
-            const place = await client.create({
-                name: placeName,
-                description: placeDescription,
+           const update= await client.update({
+
+                id: place.data!.id,
                 photos: placePhotosUrls,
-                thumbs: placePhotosThumbsUrls,
-                userEmail: userName,
-                createdAt: now.toISOString(),
-                updatedAt: now.toISOString()
+                thumbs: placePhotosThumbsUrls
 
             })
+
             console.log(place)
             alert(`Place with id ${place.data?.id} created`)
+        
             clearFields();
         }
     }
@@ -66,20 +79,64 @@ function CreatePlace() {
         setPlacePhotos([]);
     }
 
-    async function uploadPhotos(files: File[]): Promise<{
+    function getFileType(fileName: string) {
+        const ext= fileName.split('.').pop()?.toLowerCase();
+        let resp: string = "";
+
+        switch (ext) {
+            case 'pdf':
+                resp= 'application/pdf';
+                break;
+
+            case 'jpeg':
+            case 'jpg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+                resp= 'image/'+ext;
+                break; 
+            default:
+                alert('file type :'+ext+' might not be supported. Contact vendor for supports.')
+                resp=''
+        }
+        return resp
+    }
+
+    async function uploadPhotos(files: File[], id: string): Promise<{
         urls: string[]
         thumbs: string[]
     }> {
         const urls: string[] = [];
-        const thumbs: string[] = []
+        const thumbs: string[] = [];
+     
         for (const file of files) {
             console.log(`uploading file ${file.name}`)
-            const result = await uploadData({
-                data: file,
-                path: `originals/${file.name}`
-            }).result
-            urls.push(result.path);
-            thumbs.push(`thumbs/${file.name}`)
+            const contentType=getFileType(file.name)
+            console.log('extension is ', contentType)
+            //add if extension is empty 
+
+            if (contentType.startsWith('image')) {
+
+                    const result = await uploadData({
+                        data: file,
+                        path: `originals/${id}/${file.name}`,
+                        options: {
+                            contentType: contentType, // Crucial for PDFs
+                        }
+                    }).result
+                    urls.push(result.path);
+                    thumbs.push(`thumbs/${id}/${file.name}`)
+            }else {
+                const result = await uploadData({
+                        data: file,
+                        path: `originals/${id}/files/${file.name}`,
+                        options: {
+                            contentType: contentType, // Crucial for PDFs
+                        }
+                    }).result
+                    urls.push(result.path);
+                    thumbs.push(`thumbs/files/${file.name}`)
+            }
         }
         return {
             urls,
