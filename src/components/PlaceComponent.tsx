@@ -1,9 +1,6 @@
 import { StorageImage } from "@aws-amplify/ui-react-storage";
 import { type Place } from "./Places";
 import { NavLink } from "react-router";
-import { getUrl } from "aws-amplify/storage";
-
-
 
 export default function PlaceComponent(props: {
     place: Place

@@ -55,8 +55,7 @@ function PlaceDetails() {
 
     function renderPhotos() {
         const rows: any[] = [];
-        let signedURL:URL;
-
+    
         if (place) {
             place.photos?.forEach((photo, index) => {
                 if (photo) {

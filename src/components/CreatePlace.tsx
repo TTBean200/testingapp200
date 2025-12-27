@@ -36,40 +36,48 @@ function CreatePlace() {
         const now =new Date();
         let placePhotosUrls: string[] = [];
         let placePhotosThumbsUrls: string[] = [];
+
+        try {
             
-        const place = await client.create({
-            name: placeName,
-            description: placeDescription,
-            photos: placePhotosUrls,
-            thumbs: placePhotosThumbsUrls,
-            userEmail: userName? userName:'',
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString()
-
-        })
-        
-        
-
-        if(placeName && placeDescription && userName) {
-            
-            if (placePhotos && place.data) {
-                const uploadResult = await uploadPhotos(placePhotos, place.data.id)
-                placePhotosUrls = uploadResult.urls;
-                placePhotosThumbsUrls = uploadResult.thumbs;
-            }
-
-           const update= await client.update({
-
-                id: place.data!.id,
+            const place = await client.create({
+                name: placeName,
+                description: placeDescription,
                 photos: placePhotosUrls,
-                thumbs: placePhotosThumbsUrls
+                thumbs: placePhotosThumbsUrls,
+                userEmail: userName? userName:'',
+                createdAt: now.toISOString(),
+                updatedAt: now.toISOString()
 
             })
-
-            console.log(place)
-            alert(`Place with id ${place.data?.id} created`)
         
-            clearFields();
+
+            if(placeName && placeDescription && userName) {
+            
+                if (placePhotos && place.data) {
+                    const uploadResult = await uploadPhotos(placePhotos, place.data.id)
+                    placePhotosUrls = uploadResult.urls;
+                    placePhotosThumbsUrls = uploadResult.thumbs;
+                }
+            
+            
+                await client.update({
+
+                    id: place.data!.id,
+                    photos: placePhotosUrls,
+                    thumbs: placePhotosThumbsUrls
+
+                })
+            
+
+                console.log(place)
+                alert(`Place with id ${place.data?.id} created`)
+            
+                clearFields();
+            }
+        }catch (error) {
+            
+            console.error("An error occurred:", error);
+            
         }
     }
 
