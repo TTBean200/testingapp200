@@ -7,6 +7,7 @@ import type { Schema } from "../../amplify/data/resource";
 import { uploadData } from "aws-amplify/storage";
 
 
+
 export type CustomEvent = {
     target: HTMLInputElement
 }
@@ -87,7 +88,7 @@ function CreatePlace() {
         setPlacePhotos([]);
     }
 
-    function getFileType(fileName: string) {
+    function getContentType(fileName: string) {
         const ext= fileName.split('.').pop()?.toLowerCase();
         let resp: string = "";
 
@@ -119,7 +120,7 @@ function CreatePlace() {
      
         for (const file of files) {
             console.log(`uploading file ${file.name}`)
-            const contentType=getFileType(file.name)
+            const contentType=getContentType(file.name)
             console.log('extension is ', contentType)
             //add if extension is empty 
 
@@ -164,10 +165,17 @@ function CreatePlace() {
 
     function renderPhotos() {
         const photosElements: React.JSX.Element[] = [];
+      
         placePhotos.map((photo: File) => {
-            photosElements.push(
-                <img key={photo.name} src={URL.createObjectURL(photo)} alt={photo.name} height={120} />
-            )
+
+            if (getContentType(photo.name).startsWith('image')) {
+                photosElements.push(
+                <img key={photo.name} src={URL.createObjectURL(photo)} alt={photo.name} height={120} />)
+            }else {
+                photosElements.push(
+               <iframe key={photo.name} src={URL.createObjectURL(photo)} alt={photo.name} height={120} />)
+            }
+            
         })
         return photosElements
     }
